@@ -74,54 +74,38 @@ namespace Raygo.MM
         /// <summary>
         /// Stop the camera
         /// </summary>
-        public void StopCamera()
+        public bool StopCamera()
         {
-            VideoAPI.SendMessage(lwndC, VideoAPI.WM_CAP_DRIVER_DISCONNECT, 0, 0);
+        	try{
+            	VideoAPI.SendMessage(lwndC, VideoAPI.WM_CAP_DRIVER_DISCONNECT, 0, 0);
+        	}
+        	catch{
+        		return false;
+        	}
+        	return true;
         }
         
         /// <summary>   
         /// Capture Photo image
         /// </summary>   
         /// <param name="path">the path to save image</param>   
-        public bool CaptureImage(IntPtr hWndC, string path)
+        public bool CaptureImage(string path)
         {
-            VideoAPI.SendMessage(lwndC, VideoAPI.WM_CAP_SAVEDIB, 0, Marshal.StringToHGlobalAnsi(path).ToInt32());
-            Bitmap image = new Bitmap(path);
-            if (System.IO.File.Exists(path))
+        	if (System.IO.File.Exists(path))
             {
-                try
-                {
+                try{
                     System.IO.File.Delete(path);
                 }
-                catch
-                {
+                catch{
                     return false;
                 }
             }
-            string pathlow = path.ToLower();
-            try
-            {
-	            if (pathlow.Contains("bmp"))
-	            {
-	                image.Save(path, ImageFormat.Bmp);
-	            }
-	            else
-	            {
-		            if(pathlow.Contains("png"))
-		            {
-		                image.Save(path, ImageFormat.Png);
-		            }
-		            else
-		            {
-		            	image.Save(path, ImageFormat.Jpeg);
-		            }
-	            }
-            }
-            catch{
-            	image.Dispose();
-            	return false;
-            }
-            image.Dispose();
+        	try{
+            	VideoAPI.SendMessage(lwndC, VideoAPI.WM_CAP_SAVEDIB, 0, Marshal.StringToHGlobalAnsi(path).ToInt32());
+        	}
+        	catch{
+        		return false;
+        	}
             return true;
          }
     }
